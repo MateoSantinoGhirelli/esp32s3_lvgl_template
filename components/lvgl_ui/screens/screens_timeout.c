@@ -49,11 +49,12 @@ void disp_timeout_step(void)
         return;
     }
 
-    /* Return-to-main timeout (ignored while already on the main screen) */
+    /* Return-to-home timeout (ignored on home and on the splash) */
+    ui_screens_t current = ui_screens_get_current();
     if (s_timeout_to_main_ms != TIMEOUT_NEVER &&
         inactive_ms >= s_timeout_to_main_ms &&
-        ui_screens_get_current() != SCREEN_MAIN) {
-        ESP_LOGD(TAG, "timeout → main");
-        ui_screens_navigate(SCREEN_MAIN);
+        current != SCREEN_HOME && current != SCREEN_SPLASH) {
+        ESP_LOGD(TAG, "timeout → home");
+        ui_screens_navigate(SCREEN_HOME);
     }
 }

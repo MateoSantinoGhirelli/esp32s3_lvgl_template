@@ -5,31 +5,27 @@
 extern "C" {
 #endif
 
+/*
+ * UI de "S3 Monitor".
+ *
+ * Escrita a mano siguiendo la misma estructura que genera un export de
+ * SquareLine Studio (ui.c/ui.h + un archivo por pantalla en screens/).
+ * Solo construye los widgets: los eventos y la logica viven en
+ * components/lvgl_ui/screens/scr_*.c, igual que con un export real.
+ */
+
 #include "lvgl.h"
 
-/**
- * Generic placeholder UI — stands in for a SquareLine Studio export so the
- * project builds and runs before you have a real one. Re-exporting from
- * SquareLine into this folder (see README) overwrites this file; nothing
- * outside `ui/` depends on it being exactly this content, only on the
- * symbols below existing.
- *
- * It doubles as a smoke test for the display + touch BSP:
- *   - drag the arc  -> exercises touch tracking (and reveals a wrong
- *                      swap_xy/mirror_x/mirror_y touch calibration)
- *   - tap the button -> exercises touch taps + LVGL click events, and
- *                       flips the screen background color so it's obvious
- *                       even without reading the label
- */
-void ui_init(void);
+#include "screens/ui_scrSplash.h"
+#include "screens/ui_scrHome.h"
 
-extern lv_obj_t *ui_scrMain;
-extern lv_obj_t *ui_lblTitle;
-extern lv_obj_t *ui_lblSubtitle;
-extern lv_obj_t *ui_arcTest;
-extern lv_obj_t *ui_lblArcValue;
-extern lv_obj_t *ui_btnTap;
-extern lv_obj_t *ui_lblTapCount;
+/* Colores de la app */
+#define UI_COLOR_BG        0x101418
+#define UI_COLOR_PANEL     0x1C222B
+#define UI_COLOR_TEXT_DIM  0x8A94A6
+#define UI_COLOR_ACCENT    0x4FC3F7
+
+void ui_init(void);
 
 #ifdef __cplusplus
 }
