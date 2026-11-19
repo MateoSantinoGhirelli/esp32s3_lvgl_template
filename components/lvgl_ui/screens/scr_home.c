@@ -16,6 +16,10 @@ static const char *TAG = "scr_home";
 #define BATT_FULL_MV        4200
 #define BATT_ABSENT_MV      2500
 
+/* Umbrales de color del arco (en %) */
+#define BATT_LOW_PCT        20
+#define BATT_MID_PCT        50
+
 static lv_timer_t *s_refresh_timer = NULL;
 
 /* ------------------------------------------------------------------ */
@@ -27,6 +31,18 @@ static int battery_percent_from_mv(int mv)
     if (mv <= BATT_EMPTY_MV) return 0;
     if (mv >= BATT_FULL_MV)  return 100;
     return (mv - BATT_EMPTY_MV) * 100 / (BATT_FULL_MV - BATT_EMPTY_MV);
+}
+
+/* Verde > 50 %, amarillo entre 20 y 50 %, rojo < 20 % */
+static void set_battery_color(int pct)
+{
+    lv_palette_t palette = LV_PALETTE_GREEN;
+    if (pct < BATT_LOW_PCT) {
+        palette = LV_PALETTE_RED;
+    } else if (pct < BATT_MID_PCT) {
+        palette = LV_PALETTE_AMBER;
+    }
+    lv_obj_set_style_arc_color(ui_arcBattery, lv_palette_main(palette), LV_PART_INDICATOR | LV_STATE_DEFAULT);
 }
 
 static void refresh_battery(void)
@@ -45,6 +61,7 @@ static void refresh_battery(void)
 
     int pct = battery_percent_from_mv(mv);
     lv_arc_set_value(ui_arcBattery, pct);
+    set_battery_color(pct);
     lv_label_set_text_fmt(ui_lblBatteryValue, "%d%%", pct);
 }
 
