@@ -13,6 +13,11 @@ static const char *TAG = "scr_system";
 
 static lv_timer_t *s_refresh_timer = NULL;
 
+/* Minimo de heap libre visto desde el arranque o desde el ultimo reset.
+ * Lo llevamos nosotros porque esp_get_minimum_free_heap_size() no se
+ * puede reiniciar. */
+static uint32_t s_heap_min = UINT32_MAX;
+
 /* Bytes -> "123.4 KB" (sin floats: lv_label_set_text_fmt no soporta %f) */
 static void set_kb_label(lv_obj_t *label, uint32_t bytes)
 {
@@ -42,7 +47,26 @@ static void load_static_info(void)
 static void refresh_dynamic_info(void)
 {
     lv_label_set_text_fmt(ui_lblCpuValue, "%d MHz", esp_clk_cpu_freq() / 1000000);
-    set_kb_label(ui_lblHeapValue, esp_get_free_heap_size());
+
+    uint32_t heap_free = esp_get_free_heap_size();
+    if (heap_free < s_heap_min) {
+        s_heap_min = heap_free;
+    }
+    set_kb_label(ui_lblHeapValue, heap_free);
+    set_kb_label(ui_lblHeapMinValue, s_heap_min);
+}
+
+void scr_system_reset_heap_min(void)
+{
+    s_heap_min = esp_get_free_heap_size();
+    set_kb_label(ui_lblHeapMinValue, s_heap_min);
+    ESP_LOGI(TAG, "heap min reset to %u bytes", (unsigned)s_heap_min);
+}
+
+static void on_reset_heap_clicked(lv_event_t *e)
+{
+    (void)e;
+    scr_system_reset_heap_min();
 }
 
 static void on_refresh_timer(lv_timer_t *timer)
@@ -57,6 +81,8 @@ void scr_system_prepare(void)
 
     s_refresh_timer = lv_timer_create(on_refresh_timer, SYSTEM_REFRESH_MS, NULL);
     lv_timer_pause(s_refresh_timer);
+
+    lv_obj_add_event_cb(ui_btnResetHeapMin, on_reset_heap_clicked, LV_EVENT_CLICKED, NULL);
     ESP_LOGD(TAG, "prepare");
 }
 

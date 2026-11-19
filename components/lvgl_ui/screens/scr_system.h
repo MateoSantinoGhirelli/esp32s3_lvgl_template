@@ -7,4 +7,7 @@ void scr_system_init(void);
 void scr_system_uninit(void);
 void scr_system_step(void);
 
+/** Vuelve a empezar el minimo historico de heap desde el valor actual. */
+void scr_system_reset_heap_min(void);
+
 #endif
