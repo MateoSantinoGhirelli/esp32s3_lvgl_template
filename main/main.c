@@ -4,6 +4,7 @@
 #include "bsp_display.h"
 #include "bsp_touch.h"
 #include "bsp_lvgl.h"
+#include "bsp_temp.h"
 
 #include "lvgl_ui.h"
 
@@ -14,6 +15,8 @@ void app_main(void) {
     bsp_display_init();
     bsp_touch_init(i2c_bus);
     ESP_ERROR_CHECK(bsp_lvgl_init());
+    // Sensor de temperatura interno del chip (lo lee la pantalla Home)
+    ESP_ERROR_CHECK(bsp_temp_init());
     bsp_display_brightness_init();
     bsp_display_set_brightness(100);
     // Always take LVGL mutex before doing anything with LVGL
