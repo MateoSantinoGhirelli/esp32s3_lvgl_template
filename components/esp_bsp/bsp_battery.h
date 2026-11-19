@@ -5,6 +5,8 @@
 #define BSP_BATTERY_ADC_CHANNEL   ADC_CHANNEL_4
 #define BSP_BATTERY_ADC_ATTEN     ADC_ATTEN_DB_12
 #define BSP_BATTERY_ADC_UNIT      ADC_UNIT_1
+/* Solo se usa si el chip no tiene calibracion de ADC en eFuse */
+#define BSP_BATTERY_ADC_FULL_SCALE_MV   (3100)
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,4 +20,4 @@ void bsp_battery_get_voltage(float *voltage, uint16_t *adc_value);
 #endif
 
 
-#endif
+#endif
