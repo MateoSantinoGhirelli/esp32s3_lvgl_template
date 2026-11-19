@@ -5,6 +5,7 @@
 #include "bsp_touch.h"
 #include "bsp_lvgl.h"
 #include "bsp_temp.h"
+#include "bsp_battery.h"
 
 #include "lvgl_ui.h"
 
@@ -17,6 +18,8 @@ void app_main(void) {
     ESP_ERROR_CHECK(bsp_lvgl_init());
     // Sensor de temperatura interno del chip (lo lee la pantalla Home)
     ESP_ERROR_CHECK(bsp_temp_init());
+    // ADC de la bateria
+    bsp_battery_init();
     bsp_display_brightness_init();
     // Arranca apagada: el splash hace el fade-in de 0 a 100 %
     bsp_display_set_brightness(0);
