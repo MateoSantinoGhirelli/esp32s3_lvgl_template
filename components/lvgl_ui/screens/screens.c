@@ -43,6 +43,11 @@ static void on_screen_gesture(lv_event_t *e)
     lv_indev_t *indev = lv_indev_get_act();
     if (indev == NULL) return;
 
+    /* Ignorar si hay un scroll en curso o si todavia se esta animando el
+     * cambio de pantalla anterior (dos swipes rapidos seguidos). */
+    if (lv_indev_get_scroll_obj(indev) != NULL) return;
+    if (lv_disp_get_default()->scr_to_load != NULL) return;
+
     lv_dir_t dir = lv_indev_get_gesture_dir(indev);
     ui_screens_t current = ui_screens_get_current();
     if (current >= SCREEN_MAX) return;
