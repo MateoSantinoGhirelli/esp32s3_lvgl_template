@@ -85,6 +85,33 @@ lv_indev_t *bsp_lvgl_get_touch_indev(void)
     return s_lvgl_touch_indev;
 }
 
+/* ---- Fade de retroiluminacion con lv_anim + LEDC ---- */
+
+/* lv_anim necesita un "var" para identificar la animacion; usamos una
+ * variable propia porque el brillo no es un objeto LVGL. */
+static uint8_t s_backlight_anim_key;
+
+static void backlight_anim_exec_cb(void *var, int32_t value)
+{
+    (void)var;
+    bsp_display_set_brightness((uint8_t)value);
+}
+
+void bsp_lvgl_backlight_fade(uint8_t from, uint8_t to, uint32_t time_ms)
+{
+    /* Si habia un fade en curso lo cortamos para que no se pisen */
+    lv_anim_del(&s_backlight_anim_key, NULL);
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, &s_backlight_anim_key);
+    lv_anim_set_exec_cb(&a, backlight_anim_exec_cb);
+    lv_anim_set_values(&a, from, to);
+    lv_anim_set_time(&a, time_ms);
+    lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
+    lv_anim_start(&a);
+}
+
 /* ---- FatFS driver for LVGL ---- */
 
 #define FS_FATFS_LETTER     'S'
