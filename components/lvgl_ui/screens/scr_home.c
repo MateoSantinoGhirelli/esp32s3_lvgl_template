@@ -18,6 +18,10 @@ static const char *TAG = "scr_home";
 #define BATT_LOW_PCT        20
 #define BATT_MID_PCT        50
 
+/* Estado general segun la temperatura del chip (°C) */
+#define TEMP_ALERT_C        55
+#define TEMP_CRITICAL_C     70
+
 static lv_timer_t *s_refresh_timer = NULL;
 
 /* ------------------------------------------------------------------ */
@@ -56,6 +60,28 @@ static void refresh_battery(void)
     lv_obj_set_style_arc_color(ui_arcBattery, lv_palette_main(palette), LV_PART_INDICATOR | LV_STATE_DEFAULT);
 }
 
+/* Icono, texto y color del indicador de estado de la esquina */
+static void set_status(float celsius)
+{
+    const char *text = LV_SYMBOL_OK "  NORMAL";
+    lv_palette_t palette = LV_PALETTE_GREEN;
+
+    if (celsius >= TEMP_CRITICAL_C) {
+        text = LV_SYMBOL_CLOSE "  CRITICO";
+        palette = LV_PALETTE_RED;
+    } else if (celsius >= TEMP_ALERT_C) {
+        text = LV_SYMBOL_WARNING "  ALERTA";
+        palette = LV_PALETTE_AMBER;
+    }
+
+    lv_label_set_text(ui_lblStatus, text);
+    lv_obj_set_style_bg_color(ui_pnlStatus, lv_palette_main(palette), LV_PART_MAIN | LV_STATE_DEFAULT);
+    /* El valor de temperatura toma el mismo color salvo en estado normal */
+    lv_obj_set_style_text_color(ui_lblTempValue,
+                                (palette == LV_PALETTE_GREEN) ? lv_color_white() : lv_palette_main(palette),
+                                LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
 static void refresh_temperature(void)
 {
     float celsius = 0.0f;
@@ -63,6 +89,7 @@ static void refresh_temperature(void)
         lv_label_set_text(ui_lblTempValue, "--.- °C");
         return;
     }
+    set_status(celsius);
 
     /* lv_label_set_text_fmt no soporta %f, se arma en decimas de grado */
     int tenths = (int)(celsius * 10.0f + (celsius >= 0 ? 0.5f : -0.5f));
