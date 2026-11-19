@@ -9,6 +9,10 @@ static const char *TAG = "scr_settings";
 
 #define SCREEN_OFF_TIMEOUT_MS   30000
 
+/* Valores por defecto (los mismos con los que arranca la placa) */
+#define DEFAULT_BRIGHTNESS      100
+#define DEFAULT_TIMEOUT_ON      false
+
 /* ------------------------------------------------------------------ */
 /* Brillo                                                              */
 /* ------------------------------------------------------------------ */
@@ -43,11 +47,38 @@ static void on_timeout_switch_changed(lv_event_t *e)
 }
 
 /* ------------------------------------------------------------------ */
+/* Restaurar valores por defecto                                       */
+/* ------------------------------------------------------------------ */
+
+void scr_settings_restore_defaults(void)
+{
+    /* lv_slider_set_value y lv_obj_*_state no disparan VALUE_CHANGED,
+     * por eso se aplican los valores a mano ademas de mover los widgets. */
+    lv_slider_set_value(ui_sldBrightness, DEFAULT_BRIGHTNESS, LV_ANIM_ON);
+    apply_brightness(DEFAULT_BRIGHTNESS);
+
+    if (DEFAULT_TIMEOUT_ON) {
+        lv_obj_add_state(ui_swTimeout, LV_STATE_CHECKED);
+    } else {
+        lv_obj_clear_state(ui_swTimeout, LV_STATE_CHECKED);
+    }
+    apply_timeout(DEFAULT_TIMEOUT_ON);
+    ESP_LOGI(TAG, "defaults restored");
+}
+
+static void on_restore_clicked(lv_event_t *e)
+{
+    (void)e;
+    scr_settings_restore_defaults();
+}
+
+/* ------------------------------------------------------------------ */
 
 void scr_settings_prepare(void)
 {
     lv_obj_add_event_cb(ui_sldBrightness, on_brightness_changed, LV_EVENT_VALUE_CHANGED, NULL);
     lv_obj_add_event_cb(ui_swTimeout, on_timeout_switch_changed, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_add_event_cb(ui_btnRestore, on_restore_clicked, LV_EVENT_CLICKED, NULL);
 
     /* __DATE__ y __TIME__ los pone el compilador al compilar este archivo */
     lv_label_set_text(ui_lblBuildDate, "Compilado: " __DATE__ " " __TIME__);

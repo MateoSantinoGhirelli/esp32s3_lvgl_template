@@ -7,4 +7,7 @@ void scr_settings_init(void);
 void scr_settings_uninit(void);
 void scr_settings_step(void);
 
+/** Brillo al 100 % y timeout de pantalla desactivado. */
+void scr_settings_restore_defaults(void);
+
 #endif
