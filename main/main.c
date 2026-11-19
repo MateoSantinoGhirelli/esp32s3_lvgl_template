@@ -6,6 +6,7 @@
 #include "bsp_lvgl.h"
 #include "bsp_temp.h"
 #include "bsp_battery.h"
+#include "bsp_button.h"
 
 #include "lvgl_ui.h"
 
@@ -19,6 +20,8 @@ void app_main(void) {
     // Datos que muestra la pantalla Home
     ESP_ERROR_CHECK(bsp_temp_init());
     bsp_battery_init();
+    // Boton fisico BOOT (accion contextual segun la pantalla)
+    ESP_ERROR_CHECK(bsp_button_init());
     bsp_display_brightness_init();
     bsp_display_set_brightness(100);
     // Always take LVGL mutex before doing anything with LVGL
