@@ -7,4 +7,7 @@ void scr_home_init(void);
 void scr_home_uninit(void);
 void scr_home_step(void);
 
+/** Lee bateria, temperatura y uptime ya mismo (boton Actualizar / boton fisico). */
+void scr_home_force_refresh(void);
+
 #endif
