@@ -1,6 +1,7 @@
 #include "scr_home.h"
 #include "screens.h"
 #include "ui.h"
+#include "ui_input.h"
 #include "bsp_battery.h"
 #include "bsp_temp.h"
 #include "esp_log.h"
@@ -112,6 +113,8 @@ void scr_home_prepare(void)
 
 void scr_home_init(void)
 {
+    /* El boton fisico hace "click" sobre ui_btnRefresh en esta pantalla */
+    ui_input_set_action(ui_btnRefresh);
     scr_home_force_refresh();
     lv_timer_resume(s_refresh_timer);
     ESP_LOGD(TAG, "init");

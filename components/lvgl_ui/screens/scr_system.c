@@ -1,6 +1,7 @@
 #include "scr_system.h"
 #include "screens.h"
 #include "ui.h"
+#include "ui_input.h"
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_chip_info.h"
@@ -88,6 +89,8 @@ void scr_system_prepare(void)
 
 void scr_system_init(void)
 {
+    /* El boton fisico hace "click" sobre ui_btnResetHeapMin en esta pantalla */
+    ui_input_set_action(ui_btnResetHeapMin);
     refresh_dynamic_info();
     lv_timer_resume(s_refresh_timer);
     ESP_LOGD(TAG, "init");

@@ -1,6 +1,7 @@
 #include "scr_settings.h"
 #include "screens.h"
 #include "ui.h"
+#include "ui_input.h"
 #include "bsp_display.h"
 #include "screens_timeout.h"
 #include "esp_log.h"
@@ -87,6 +88,8 @@ void scr_settings_prepare(void)
 
 void scr_settings_init(void)
 {
+    /* El boton fisico hace "click" sobre ui_btnRestore en esta pantalla */
+    ui_input_set_action(ui_btnRestore);
     /* El slider refleja el brillo real al entrar */
     int32_t current = bsp_display_get_brightness();
     lv_slider_set_value(ui_sldBrightness, current, LV_ANIM_OFF);

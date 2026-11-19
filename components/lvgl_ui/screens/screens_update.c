@@ -3,6 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "esp_log.h"
+#include "ui_input.h"
 
 #define UPDATE_QUEUE_DEPTH 16
 
@@ -22,14 +23,17 @@ static QueueHandle_t s_queue = NULL;
 
 typedef void (*handler_fn_t)(void *data);
 
-/* Placeholder — remove when UI_UPDATE_MAX has real commands */
-#if UI_UPDATE_MAX == 0
-static const handler_fn_t s_handlers[] = { NULL };
-#else
+/* Ya estamos en contexto LVGL: se "aprieta" ENTER en el keypad y el grupo
+ * se lo entrega al boton de accion de la pantalla activa. */
+static void handle_button_click(void *data)
+{
+    (void)data;
+    ui_input_post_enter();
+}
+
 static const handler_fn_t s_handlers[UI_UPDATE_MAX] = {
-    /* [UI_UPDATE_TEMPERATURE] = handle_temperature, */
+    [UI_UPDATE_BUTTON_CLICK] = handle_button_click,
 };
-#endif
 
 /* ------------------------------------------------------------------ */
 
