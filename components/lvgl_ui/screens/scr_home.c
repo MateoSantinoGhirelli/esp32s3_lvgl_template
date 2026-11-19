@@ -2,6 +2,7 @@
 #include "screens.h"
 #include "ui.h"
 #include "bsp_battery.h"
+#include "bsp_temp.h"
 #include "esp_log.h"
 
 static const char *TAG = "scr_home";
@@ -46,9 +47,26 @@ static void refresh_battery(void)
     lv_label_set_text_fmt(ui_lblBatteryValue, "%d%%", pct);
 }
 
+static void refresh_temperature(void)
+{
+    float celsius = 0.0f;
+    if (bsp_temp_get_celsius(&celsius) != ESP_OK) {
+        lv_label_set_text(ui_lblTempValue, "--.- °C");
+        return;
+    }
+
+    /* lv_label_set_text_fmt no soporta %f (LV_SPRINTF_USE_FLOAT = 0),
+     * asi que se arma con enteros en decimas de grado. */
+    int tenths = (int)(celsius * 10.0f + (celsius >= 0 ? 0.5f : -0.5f));
+    const char *sign = (tenths < 0) ? "-" : "";
+    if (tenths < 0) tenths = -tenths;
+    lv_label_set_text_fmt(ui_lblTempValue, "%s%d.%d °C", sign, tenths / 10, tenths % 10);
+}
+
 static void refresh_all(void)
 {
     refresh_battery();
+    refresh_temperature();
 }
 
 static void on_refresh_timer(lv_timer_t *timer)
