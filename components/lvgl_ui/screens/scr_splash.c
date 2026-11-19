@@ -45,9 +45,30 @@ static void start_dots_anim(void)
 }
 
 /* ------------------------------------------------------------------ */
+/* Toque en cualquier punto                                            */
+/* ------------------------------------------------------------------ */
+
+/* El evento se registra en el objeto pantalla. Los labels no son
+ * clickeables, asi que cualquier toque cae sobre la pantalla. */
+static void on_splash_touch(lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+
+    if (code == LV_EVENT_PRESSED) {
+        /* Feedback inmediato mientras el dedo esta apoyado */
+        lv_obj_set_style_text_color(ui_lblTapHint, lv_color_white(), 0);
+    } else if (code == LV_EVENT_CLICKED) {
+        ESP_LOGI(TAG, "touch -> home");
+        ui_screens_navigate(SCREEN_HOME);
+    }
+}
+
+/* ------------------------------------------------------------------ */
 
 void scr_splash_prepare(void)
 {
+    lv_obj_add_event_cb(ui_scrSplash, on_splash_touch, LV_EVENT_PRESSED, NULL);
+    lv_obj_add_event_cb(ui_scrSplash, on_splash_touch, LV_EVENT_CLICKED, NULL);
     ESP_LOGD(TAG, "prepare");
 }
 
