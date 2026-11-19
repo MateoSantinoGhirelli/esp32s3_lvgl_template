@@ -105,11 +105,18 @@ void bsp_battery_get_voltage(float *voltage, uint16_t *adc_value)
     if (do_calibration1_chan0)
     {
         ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_chan0_handle, adc_raw, &voltage_int));
-        *voltage = (voltage_int / 1000.0f) * 3.0; 
+    }
+    else
+    {
+        // Sin calibracion: estimacion lineal (12 bits, ~3.1 V a fondo de escala con 12 dB)
+        voltage_int = (adc_raw * BSP_BATTERY_ADC_FULL_SCALE_MV) / 4095;
+    }
 
-        if (adc_value)
-        {
-            *adc_value = adc_raw;
-        }   
+    // Divisor resistivo 1/3 en la placa
+    *voltage = (voltage_int / 1000.0f) * 3.0f;
+
+    if (adc_value)
+    {
+        *adc_value = adc_raw;
     }
 }
