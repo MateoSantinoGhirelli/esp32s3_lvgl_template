@@ -28,13 +28,48 @@ static const screen_config_t screen_configs[SCREEN_MAX] = {
 
 static ui_screens_t s_active_screen = SCREEN_MAX; /* SCREEN_MAX = "unknown" */
 
+#define SWIPE_ANIM_MS 200
+
 /* ------------------------------------------------------------------ */
+
+/**
+ * Swipe horizontal: izquierda = pantalla siguiente, derecha = anterior.
+ * Se registra en todas las pantallas; los hijos tienen GESTURE_BUBBLE por
+ * defecto, asi que el gesto llega a la pantalla aunque empiece sobre un panel.
+ */
+static void on_screen_gesture(lv_event_t *e)
+{
+    (void)e;
+    lv_indev_t *indev = lv_indev_get_act();
+    if (indev == NULL) return;
+
+    lv_dir_t dir = lv_indev_get_gesture_dir(indev);
+    ui_screens_t current = ui_screens_get_current();
+    if (current >= SCREEN_MAX) return;
+
+    ui_screens_t target = current;
+    if (dir == LV_DIR_LEFT && current + 1 < SCREEN_MAX) {
+        target = current + 1;
+    } else if (dir == LV_DIR_RIGHT && current > 0) {
+        target = current - 1;
+    }
+    if (target == current) return;
+
+    /* Que el mismo toque no termine en un CLICKED sobre la pantalla nueva */
+    lv_indev_wait_release(indev);
+    ui_screens_navigate_anim(target, (dir == LV_DIR_LEFT) ? LV_SCR_LOAD_ANIM_MOVE_LEFT
+                                                         : LV_SCR_LOAD_ANIM_MOVE_RIGHT);
+}
+
 
 void ui_screens_prepare(void)
 {
     navbar_create();
 
     for (int i = 0; i < SCREEN_MAX; i++) {
+        if (screen_configs[i].screen_obj && *screen_configs[i].screen_obj) {
+            lv_obj_add_event_cb(*screen_configs[i].screen_obj, on_screen_gesture, LV_EVENT_GESTURE, NULL);
+        }
         if (screen_configs[i].prepare) {
             screen_configs[i].prepare();
         }
@@ -58,6 +93,15 @@ void ui_screens_navigate(ui_screens_t screen)
     const screen_config_t *cfg = &screen_configs[screen];
     if (cfg->screen_obj && *cfg->screen_obj) {
         lv_disp_load_scr(*cfg->screen_obj);
+    }
+}
+
+void ui_screens_navigate_anim(ui_screens_t screen, lv_scr_load_anim_t anim)
+{
+    if (screen >= SCREEN_MAX) return;
+    const screen_config_t *cfg = &screen_configs[screen];
+    if (cfg->screen_obj && *cfg->screen_obj) {
+        lv_scr_load_anim(*cfg->screen_obj, anim, SWIPE_ANIM_MS, 0, false);
     }
 }
 

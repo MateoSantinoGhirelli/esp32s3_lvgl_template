@@ -54,6 +54,9 @@ ui_screens_t  ui_screens_get_current(void);
  */
 void          ui_screens_navigate(ui_screens_t screen);
 
+/** Same as ui_screens_navigate() but with a screen load animation (used by swipe). */
+void          ui_screens_navigate_anim(ui_screens_t screen, lv_scr_load_anim_t anim);
+
 /**
  * Signal user activity (touch, encoder …). Resets the LVGL inactivity timer
  * used by screens_timeout to decide when to dim / turn off the display.
